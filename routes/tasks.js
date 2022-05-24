@@ -11,7 +11,7 @@ router.get("/", async (req, res) => {
 router.post("/", async (req, res) => {
   const validBody = validateTask(req.body);
   if (validBody.error) {
-    return res.json(validBody.error.details);
+    return res.status(400).json(validBody.error.details);
   }
   try {
     const data = new TaskModel(req.body);
@@ -26,13 +26,17 @@ router.post("/", async (req, res) => {
 router.put("/:idEdit", async (req, res) => {
   const validBody = validateTask(req.body);
   if (validBody.error) {
-    return res.json(validBody.error.details);
+    return res.status(401).json(validBody.error.details);
   }
-  const data = await TaskModel.updateOne(
-    { task_id: req.params.idEdit },
-    req.body
-  );
-  res.json(data);
+  try {
+    const data = await TaskModel.updateOne(
+      { task_id: req.params.idEdit },
+      req.body
+    );
+    res.json(data);
+  } catch (error) {
+    res.status(400).json({ error: error });
+  }
 });
 
 router.delete("/:idDel", async (req, res) => {
