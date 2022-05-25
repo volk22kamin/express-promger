@@ -39,6 +39,11 @@ router.put("/:idEdit", async (req, res) => {
   }
 });
 
+router.get("/:email", async (req, res) => {
+  const allTasks = await TaskModel.find({ email: req.params.email });
+  res.json(allTasks);
+});
+
 router.delete("/:idDel", async (req, res) => {
   const data = await TaskModel.deleteOne({ task_id: req.params.idDel });
   res.json(data);
