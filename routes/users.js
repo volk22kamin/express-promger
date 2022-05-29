@@ -18,6 +18,14 @@ router.get("/", async (req, res) => {
   res.json(data);
 });
 
+router.get("/one/:email", async (req, res) => {
+  const data = await UserModel.findOne(
+    { email: req.params.email },
+    { password: 0 }
+  );
+  res.json(data);
+});
+
 router.get("/emails", async (req, res) => {
   const data = await UserModel.find({}, { email: 1 });
   res.json(data);
@@ -41,7 +49,6 @@ router.post("/register", async (req, res) => {
     return res.json({ isNew: true, status: "registered", data: newToken });
     // res.json(user);
   } catch (error) {
-    console.log(error);
     res.status(400).json({ error: "did not work" });
   }
 });
