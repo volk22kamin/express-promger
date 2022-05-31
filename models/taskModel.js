@@ -19,7 +19,7 @@ exports.validateTask = (reqBody) => {
     task_id: Joi.number().min(2).required(),
     priority: Joi.string().min(2).max(100).required(),
     status: Joi.string().min(2).max(15).required(),
-    project_id: Joi.number().min(1).max(15).required(),
+    project_id: Joi.string().required(),
   });
   return joiSchema.validate(reqBody);
 };

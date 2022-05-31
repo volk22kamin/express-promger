@@ -18,12 +18,19 @@ router.get("/", async (req, res) => {
   res.json(data);
 });
 
+router.get("/one/:email", async (req, res) => {
+  const data = await UserModel.findOne(
+    { email: req.params.email },
+    { password: 0 }
+  );
+  res.json(data);
+});
+
 router.get("/emails", async (req, res) => {
   const data = await UserModel.find({}, { email: 1 });
   res.json(data);
 });
 
-// check later if i really have to use a different route
 router.post("/register", async (req, res) => {
   const validBody = validateUser(req.body);
   if (validBody.error) {
@@ -41,8 +48,23 @@ router.post("/register", async (req, res) => {
     return res.json({ isNew: true, status: "registered", data: newToken });
     // res.json(user);
   } catch (error) {
-    console.log(error);
     res.status(400).json({ error: "did not work" });
+  }
+});
+
+router.put("/:idEdit", async (req, res) => {
+  // const validBody = validateUser(req.body);
+  // if (validBody.error) {
+  //   return res.status(401).json(validBody.error.details);
+  // }
+  try {
+    const data = await UserModel.updateOne(
+      { _id: req.params.idEdit },
+      req.body
+    );
+    res.json(data);
+  } catch (error) {
+    res.status(400).json({ error: error });
   }
 });
 

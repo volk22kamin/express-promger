@@ -18,7 +18,6 @@ router.post("/", async (req, res) => {
     await data.save();
     res.json(data);
   } catch (error) {
-    console.log(error);
     res.status(400).json({ error: "did not work" });
   }
 });
@@ -39,7 +38,12 @@ router.put("/:idEdit", async (req, res) => {
   }
 });
 
-router.get("/:email", async (req, res) => {
+router.get("/byProjectId/:id", async (req, res) => {
+  const allTasks = await TaskModel.find({ project_id: req.params.id });
+  res.json(allTasks);
+});
+
+router.get("/byEmail/:email", async (req, res) => {
   const allTasks = await TaskModel.find({ email: req.params.email });
   res.json(allTasks);
 });
