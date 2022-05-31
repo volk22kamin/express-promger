@@ -18,7 +18,7 @@ app.use(cors());
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/tasks", taskRouter);
 app.use("/users", userRouter);
-app.use("/allProjects", projectRouter);
+app.use("/projects", projectRouter);
 
 const server = http.createServer(app);
 
