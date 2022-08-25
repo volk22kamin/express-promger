@@ -14,17 +14,6 @@ router.get("/:id", async (req, res) => {
   res.json(data);
 });
 
-// router.get("/array/:id", async (req, res) => {
-//   const ids = ["6295cb16ac6e1dc8ceb49840", "6295cb1bac6e1dc8ceb49842"];
-//   const projects_ar = await Promise.all(
-//     ids.map(async (projectId) => {
-//       console.log(projectId);
-//       const data = await ProjectsModel.findOne({ _id: projectId });
-//     })
-//   );
-//   res.json(projects_ar);
-// });
-
 router.get("/perUser/:id", async (req, res) => {
   try {
     const user = await UserModel.findOne({ _id: req.params.id });

@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const ts = require("../services/taskService");
 
 const { TaskModel, validateTask } = require("../models/taskModel");
 
@@ -36,6 +37,12 @@ router.put("/:idEdit", async (req, res) => {
   } catch (error) {
     res.status(400).json({ error: error });
   }
+});
+
+router.delete("/project/:id", async (req, res) => {
+  const data = await ts.removeUserFromTasks(req.params.id, req.body.email);
+
+  res.send(data);
 });
 
 router.get("/byProjectId/:id", async (req, res) => {
