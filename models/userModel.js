@@ -22,8 +22,8 @@ const userSchema = new mongoose.Schema({
 
 exports.UserModel = mongoose.model("users", userSchema);
 
-exports.genToken = (id, email) => {
-  const token = jwt.sign({ id: id, email: email }, JWT_SECRET, {
+exports.genToken = (id) => {
+  const token = jwt.sign({ id: id }, JWT_SECRET, {
     expiresIn: "30d",
   });
   return token;

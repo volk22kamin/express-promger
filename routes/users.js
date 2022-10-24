@@ -11,6 +11,8 @@ const {
   validateLogin,
   genToken,
 } = require("../models/userModel");
+
+const { googleUserModel } = require("../models/googleUserModel");
 const { authToken } = require("../auth/authToken");
 
 router.get("/", async (req, res) => {
@@ -43,7 +45,7 @@ router.post("/register", async (req, res) => {
     user.password = password;
     await user.save();
     user.password = "*****";
-    const newToken = genToken(user._id, user.email);
+    const newToken = genToken(user._id);
 
     return res.json({ isNew: true, status: "registered", data: newToken });
     // res.json(user);
@@ -78,7 +80,7 @@ router.post("/login", async (req, res) => {
   }
 
   if (await bcrypt.compare(password, user.password)) {
-    const newToken = genToken(user._id, user.email);
+    const newToken = genToken(user._id);
 
     return res.json({ status: "ok", data: newToken });
   } else {
@@ -91,6 +93,7 @@ router.get("/tokenLogin", authToken, async (req, res) => {
     { _id: req.tokenData.id },
     { password: 0 }
   );
+
   // res.json({ ...user, isValidated: true });
   res.json(user);
 });
