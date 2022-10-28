@@ -12,8 +12,8 @@ const {
   genToken,
 } = require("../models/userModel");
 
-const { googleUserModel } = require("../models/googleUserModel");
 const { authToken } = require("../auth/authToken");
+const { passwordModel } = require("../models/passwordModel");
 
 router.get("/", async (req, res) => {
   const data = await UserModel.find({});
@@ -21,10 +21,7 @@ router.get("/", async (req, res) => {
 });
 
 router.get("/one/:email", async (req, res) => {
-  const data = await UserModel.findOne(
-    { email: req.params.email },
-    { password: 0 }
-  );
+  const data = await UserModel.findOne({ email: req.params.email });
   res.json(data);
 });
 
@@ -34,31 +31,40 @@ router.get("/emails", async (req, res) => {
 });
 
 router.post("/register", async (req, res) => {
-  const validBody = validateUser(req.body);
-  if (validBody.error) {
-    return res.json(validBody.error.details);
-  }
-  try {
-    const password = await bcrypt.hash(req.body.password, 10);
+  const isUserExist = await UserModel.findOne({ email: req.body.email });
 
-    const user = new UserModel(req.body);
-    user.password = password;
-    await user.save();
-    user.password = "*****";
-    const newToken = genToken(user._id);
+  if (isUserExist) {
+    const token = genToken(isUserExist._id);
 
-    return res.json({ isNew: true, status: "registered", data: newToken });
-    // res.json(user);
-  } catch (error) {
-    res.status(400).json({ error: "did not work" });
+    return res.status(401).json({
+      isNew: false,
+      status: 203,
+      token: token,
+      error: "the email is alredy exist",
+    });
+  } else {
+    try {
+      const user = new UserModel(req.body);
+      await user.save();
+      const oldUser = await UserModel.findOne({ email: req.body.email });
+      if (req.body.type === "local") {
+        const password = await bcrypt.hash(req.body.password, 10);
+        const newPassword = new passwordModel({
+          _id: oldUser._id,
+          password: password,
+        });
+        await newPassword.save();
+      }
+      const newToken = genToken(user._id);
+
+      return res.json({ isNew: true, status: "registered", data: newToken });
+    } catch (error) {
+      res.status(400).json({ error: "did not work" });
+    }
   }
 });
 
 router.put("/:idEdit", async (req, res) => {
-  // const validBody = validateUser(req.body);
-  // if (validBody.error) {
-  //   return res.status(401).json(validBody.error.details);
-  // }
   try {
     const data = await UserModel.updateOne(
       { _id: req.params.idEdit },
@@ -79,7 +85,9 @@ router.post("/login", async (req, res) => {
     return res.json({ status: "error", data: "invalid username" });
   }
 
-  if (await bcrypt.compare(password, user.password)) {
+  const passwordObj = await passwordModel.findOne({ _id: user._id });
+
+  if (await bcrypt.compare(password, passwordObj.password)) {
     const newToken = genToken(user._id);
 
     return res.json({ status: "ok", data: newToken });
@@ -94,7 +102,6 @@ router.get("/tokenLogin", authToken, async (req, res) => {
     { password: 0 }
   );
 
-  // res.json({ ...user, isValidated: true });
   res.json(user);
 });
 module.exports = router;

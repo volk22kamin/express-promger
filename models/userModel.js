@@ -8,7 +8,7 @@ const JWT_SECRET = "dsfasefs$$WT#T#$T#$T$#^%GESG$%U*&^IVSDGRTG$E%";
 const userSchema = new mongoose.Schema({
   name: String,
   email: String,
-  password: String,
+  type: String,
   projects: [],
   isAdmin: {
     type: Boolean,
@@ -29,23 +29,10 @@ exports.genToken = (id) => {
   return token;
 };
 
-exports.validateUser = (reqBody) => {
-  const joiSchema = Joi.object({
-    name: Joi.string().min(2).max(100).required(),
-    email: Joi.string().min(2).max(25).required().email(),
-    password: Joi.string().min(6).max(25).required(),
-    isAdmin: Joi.boolean(),
-    projects: Joi.array(),
-    _id: Joi.string(),
-    __v: Joi.number(),
-  });
-  return joiSchema.validate(reqBody);
-};
-
 exports.validateLogin = (reqBody) => {
   const joiSchema = Joi.object({
     email: Joi.string().min(2).max(25).required().email(),
-    password: Joi.string().min(6).max(25).required(),
   });
+
   return joiSchema.validate(reqBody);
 };
